@@ -232,12 +232,28 @@ function extractHierarchicalData(xmlObj) {
 
 function createSingleSheet(data) {
   const rows = [];
+
+  const notFound = 'not_found'
+  
+  // Считаем сумму G по всем изделиям
+  let totalOrderSumG = 0;
+  data.products.forEach((product) => {
+    let sumDetailG = 0;
+    product.details.forEach(detail => {
+      let sumTotalTime = 0;
+      detail.operations.forEach(op => {
+        sumTotalTime += op.totalTime || 0;
+      });
+      sumDetailG += detail.quantity * sumTotalTime;
+    });
+    totalOrderSumG += sumDetailG;
+  });
   
   // ===== СТРОКА 1: ИНФОРМАЦИЯ О ПРОЕКТЕ =====
   rows.push([
     data.projectName,           // A - Номер проекта
     data.projectName,           // B - Наименование проекта
-    'Сумма в руб на заказ'      // C - Константа
+    totalOrderSumG              // C - Сумма строк № изделия по графе G
   ]);
   
   // ===== ИЗДЕЛИЯ =====
@@ -268,7 +284,7 @@ function createSingleSheet(data) {
       rows.push([
         'дет. № ' + detail.id,                         // A - порядковый номер + "деталь"
         detail.name,                                   // B - Наименование
-        detail.color || 'not_found',                   // C - ЦветМатериала
+        detail.color || notFound,                      // C - ЦветМатериала
         detail.quantity,                               // D - Количество
         sumTotalTime,                                  // E - Сумма времени по всем операциям на деталь (сумма H по операциям)
         sumCost,                                       // F - Сумма в руб на одну деталь (сумма I по операциям)
@@ -279,7 +295,7 @@ function createSingleSheet(data) {
       // ===== ОПЕРАЦИИ =====
       detail.operations.forEach((op) => {
         rows.push([
-          'оп. № ' + op.id,                             // A - порядковый номер + "операция"
+          'оп. № ' + op.id,                            // A - порядковый номер + "операция"
           op.name,                                     // B - Наименование
           op.unit || '',                               // C - Ед.изм.
           op.laborTime || 0,                           // D - Норма времени (Трудоемкость)
