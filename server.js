@@ -206,7 +206,6 @@ function extractHierarchicalData(xmlObj) {
             const laborTime = op.Трудоемкость !== undefined ? parseFloat(op.Трудоемкость) : 0;
             const price = op.Цена !== undefined ? parseFloat(op.Цена) : 0;
             const quantity = op.Количество !== undefined ? parseFloat(op.Количество) : 0;
-            const cost = op.Стоимость !== undefined ? parseFloat(op.Стоимость) : 0;
             
             detailData.operations.push({
               id: opIdx + 1,
@@ -258,15 +257,38 @@ function createSingleSheet(data) {
   
   // ===== ИЗДЕЛИЯ =====
   data.products.forEach((product) => {
+    // Считаем D и E для изделия
+    // D = сумма строк № детали по графе G
+    // E = сумма строк № детали по графе H
+    let sumDetailG = 0;  // D - Сумма всех времён на изделие
+    let sumDetailH = 0;  // E - Сумма в руб. на изделие
+    
+    product.details.forEach(detail => {
+      // Считаем для каждой детали ее G и H
+      let sumTotalTime = 0;
+      let sumCost = 0;
+      
+      detail.operations.forEach(op => {
+        sumTotalTime += op.totalTime || 0;
+        sumCost += op.cost || 0;
+      });
+      
+      const detailG = detail.quantity * sumTotalTime;  // G детали
+      const detailH = detail.quantity * sumCost;       // H детали
+      
+      sumDetailG += detailG;
+      sumDetailH += detailH;
+    });
+    
     // Строка изделия
     rows.push([
       product.order,                                  // A - Заказ
       product.name,                                   // B - Наименование
       product.quantity,                               // C - Количество
-      0,                                              // D - Сумма всех времён на изделие (пока 0)
-      0,                                              // E - Сумма в руб. на изделие (пока 0)
-      0,                                              // F - Сумма времени на все изделия (пока 0)
-      0                                               // G - Сумма в руб на все изделия (пока 0)
+      sumDetailG,                                     // D - Сумма всех времён на изделие (сумма G по деталям)
+      sumDetailH,                                     // E - Сумма в руб. на изделие (сумма H по деталям)
+      'не понятно',                                   // F - Сумма времени на все изделия (пока 0)
+      'не понятно'                                    // G - Сумма в руб на все изделия (пока 0)
     ]);
     
     // ===== ДЕТАЛИ =====
