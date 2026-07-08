@@ -115,9 +115,9 @@ function extractHierarchicalData(xmlObj) {
 
   const project = xmlObj.Проект;
   
-  if (project.$) {
-    result.projectName = project.$.Наименование || '';
-    result.projectNumber = project.$.Номер || '';
+  if (project) {
+    result.projectName = project.Наименование || '';
+    result.projectNumber = project.Номер || '';
   }
 
   if (!project.Изделие) {
@@ -251,8 +251,8 @@ function createSingleSheet(data) {
   
   // ===== СТРОКА 1: ИНФОРМАЦИЯ О ПРОЕКТЕ =====
   rows.push([
-    data.projectName,           // A - Номер проекта
-    data.projectName,           // B - Наименование проекта
+    data.projectName,           // A - Наименование проекта
+    data.projectNumber,         // B - Номер проекта
     totalOrderSumG              // C - Сумма строк № изделия по графе G
   ]);
   
