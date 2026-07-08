@@ -266,9 +266,9 @@ function createSingleSheet(data) {
       
       // Строка детали
       rows.push([
-        'дет. №' + detail.id,                         // A - порядковый номер + "деталь"
+        'дет. № ' + detail.id,                         // A - порядковый номер + "деталь"
         detail.name,                                   // B - Наименование
-        detail.color,                                  // C - ЦветМатериала
+        detail.color || 'not_found',                   // C - ЦветМатериала
         detail.quantity,                               // D - Количество
         sumTotalTime,                                  // E - Сумма времени по всем операциям на деталь (сумма H по операциям)
         sumCost,                                       // F - Сумма в руб на одну деталь (сумма I по операциям)
@@ -279,7 +279,7 @@ function createSingleSheet(data) {
       // ===== ОПЕРАЦИИ =====
       detail.operations.forEach((op) => {
         rows.push([
-          'оп. №' + op.id,                             // A - порядковый номер + "операция"
+          'оп. № ' + op.id,                             // A - порядковый номер + "операция"
           op.name,                                     // B - Наименование
           op.unit || '',                               // C - Ед.изм.
           op.laborTime || 0,                           // D - Норма времени (Трудоемкость)
