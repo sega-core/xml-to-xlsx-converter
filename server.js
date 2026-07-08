@@ -101,6 +101,8 @@ app.post('/convert', upload.single('xmlFile'), async (req, res) => {
   }
 });
 
+const notFound = 'not_found'
+
 function extractHierarchicalData(xmlObj) {
   const result = {
     projectName: '',
@@ -116,8 +118,8 @@ function extractHierarchicalData(xmlObj) {
   const project = xmlObj.Проект;
   
   if (project) {
-    result.projectName = project.Наименование || '';
-    result.projectNumber = project.Номер || '';
+    result.projectName = project.Наименование || notFound;
+    result.projectNumber = project.Номер || notFound;
   }
 
   if (!project.Изделие) {
@@ -215,7 +217,7 @@ function extractHierarchicalData(xmlObj) {
               sumRubOp: laborTime * price,             // F - Сумма в руб на операцию (D * E)
               quantity: quantity,                      // G - Количество
               totalTime: quantity * laborTime,         // H - Суммарное время по операции (G * D)
-              cost: cost                               // I - Стоимость
+              cost: price * (quantity * laborTime)     // I - Сумма в руб. (E * H)
             });
           });
         }
@@ -233,8 +235,6 @@ function extractHierarchicalData(xmlObj) {
 function createSingleSheet(data) {
   const rows = [];
 
-  const notFound = 'not_found'
-  
   // Считаем сумму G по всем изделиям
   let totalOrderSumG = 0;
   data.products.forEach((product) => {
@@ -303,7 +303,7 @@ function createSingleSheet(data) {
           op.sumRubOp || 0,                            // F - Сумма в руб на операцию (D * E)
           op.quantity || 0,                            // G - Количество
           op.totalTime || 0,                           // H - Суммарное время по операции (G * D)
-          op.cost || 0                                 // I - Стоимость
+          op.cost || 0                                 // I - Стоимость (E * H)
         ]);
       });
     });
