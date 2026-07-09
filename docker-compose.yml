@@ -1,0 +1,17 @@
+services:
+  xml-converter:
+    build: .
+    container_name: xml-to-xlsx-converter
+    restart: always
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./uploads:/app/uploads
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
