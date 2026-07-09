@@ -10,8 +10,5 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3002
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+    # Запускаем от root внутри контейнера для доступа к файлам
+    user: "0:0"
